@@ -11,7 +11,7 @@ LudoTrace mods are the open capture layer. Each mod watches a game, writes a str
 | Game | Status | Mod repo | Nexus |
 |------|--------|----------|-------|
 | Fallout 4 | Active | [ludotrace/fallout4](https://github.com/ludotrace/fallout4) | [Nexus Mods](https://www.nexusmods.com/fallout4/mods/106076) |
-| Stardew Valley | Planned | — | — |
+| Stardew Valley | Active | [ludotrace/stardew](https://github.com/ludotrace/stardew) | [Nexus Mods](https://www.nexusmods.com/stardewvalley/mods/48026) |
 
 ---
 
@@ -56,3 +56,7 @@ If you build a mod, open an issue or PR to add it to the table above.
 - [SPEC.md](./SPEC.md) — full schema contract
 - [ludotrace/fallout4](https://github.com/ludotrace/fallout4) — reference implementation (Papyrus)
 - [ludotrace.github.io](https://ludotrace.github.io) — project site
+
+## Found a bug, or want to contribute?
+
+Open an issue or a pull request on [github.com/ludotrace/mods](https://github.com/ludotrace/mods). If you're adding a mod for a new game, open a PR against the table above once it's working.
