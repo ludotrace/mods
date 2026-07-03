@@ -80,7 +80,7 @@ Written when a play session begins (on game load, new game, or equivalent).
 - Must be the first event in every session.
 - Should include a snapshot of the player's current state (level, stats, inventory, etc.)
   so Core has baseline context for the session.
-- lt-client uses `session_start` as the opening boundary of an uploadable session.
+- `session_start` is the **only** structural boundary lt-client uses to split sessions — a new `session_start` closes whatever session was open and starts a new one.
 
 ### `session_end`
 
@@ -91,9 +91,13 @@ Written when a play session ends (on save, quit, or equivalent).
 ```
 
 - Should mirror `session_start` fields so Core can diff start vs. end state.
-- lt-client uses `session_end` as the closing boundary of an uploadable session. A session
-  without `session_end` (crash, force-quit) is uploaded as an orphan after a 30-minute
-  inactivity window.
+- `session_start` is the **only** structural boundary lt-client uses to split sessions.
+  `session_end` is **opaque payload** — lt-client buffers it into the current session
+  without treating it as a terminator. A single play session (one `session_start`) may
+  contain many `session_end` lines (e.g. Fallout 4 writes one per save); this is
+  intentional and game-agnostic — never design around `session_end` as a close signal.
+- A session without a new `session_start` to close it (crash, force-quit) is uploaded as
+  an orphan after a configured inactivity window.
 
 ### `location`
 
