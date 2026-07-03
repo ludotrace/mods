@@ -1,0 +1,19 @@
+name: validate
+
+# CI on every push/PR: build the validator and confirm it accepts the valid
+# fixture and rejects the invalid one. Releases are handled by release.yml.
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+      - run: make test

@@ -1,0 +1,9 @@
+{"type": "session_start", "game_time": "00:00", "level": 12, "location": "Sanctuary"}
+{"type": "location", "name": "Diamond City", "game_time": "01:14"}
+{"type": "kill", "target": "Raider", "killer": "", "game_time": "01:22"}
+{"type": "quest_stage", "quest": "The First Step", "stage": 10, "game_time": "01:40"}
+{"type": "near_collectible", "name": "Bobblehead: Strength", "game_time": "02:03"}
+{"type": "stat", "stat": "Radiation", "value": 42, "game_time": "02:10"}
+{"type": "used", "item": "Stimpak", "game_time": "02:11"}
+{"type": "fo4_power_armor", "entered": true, "game_time": "02:15"}
+{"type": "session_end", "game_time": "02:45", "level": 13, "wall_time": "2024-11-15T14:32:00Z"}

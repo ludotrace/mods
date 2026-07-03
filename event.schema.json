@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ludotrace.github.io/schema/event.schema.json",
+  "title": "LudoTrace event",
+  "description": "One line of a LudoTrace events file (lt_<game_id>_events.jsonl). Validate each non-blank line of the file against this schema. See SPEC.md for the full contract; this schema is the executable form of its Line Format and Reserved Event Types sections.",
+  "type": "object",
+  "required": ["type"],
+  "properties": {
+    "type": {
+      "type": "string",
+      "description": "Event kind. Reserved types have required fields (below); game-specific types are allowed and only need this base shape."
+    },
+    "game_time": {
+      "type": "string",
+      "description": "In-world clock time in the game's native format, e.g. \"14:32\". Format is game-specific, so only asserted to be a string."
+    },
+    "game_date": {
+      "type": "string",
+      "format": "date",
+      "description": "In-world calendar date, ISO 8601 (e.g. \"2288-02-28\")."
+    },
+    "wall_time": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Real-world UTC timestamp, ISO 8601 (e.g. \"2024-11-15T14:32:00Z\")."
+    }
+  },
+  "comment": "Additional fields are event-specific and pass through to the LLM as-is; additionalProperties is intentionally NOT restricted. Reserved-type branches assert required fields + their types only, per SPEC.",
+  "allOf": [
+    {
+      "if": { "required": ["type"], "properties": { "type": { "const": "location" } } },
+      "then": {
+        "required": ["name"],
+        "properties": { "name": { "type": "string" } }
+      }
+    },
+    {
+      "if": { "required": ["type"], "properties": { "type": { "const": "kill" } } },
+      "then": {
+        "required": ["target"],
+        "properties": { "target": { "type": "string" } }
+      }
+    },
+    {
+      "if": { "required": ["type"], "properties": { "type": { "const": "quest_stage" } } },
+      "then": {
+        "required": ["quest", "stage"],
+        "properties": {
+          "quest": { "type": "string" },
+          "stage": { "type": "integer" }
+        }
+      }
+    },
+    {
+      "if": { "required": ["type"], "properties": { "type": { "const": "near_collectible" } } },
+      "then": {
+        "required": ["name"],
+        "properties": { "name": { "type": "string" } }
+      }
+    },
+    {
+      "if": { "required": ["type"], "properties": { "type": { "const": "stat" } } },
+      "then": {
+        "required": ["stat", "value"],
+        "properties": {
+          "stat": { "type": "string" },
+          "value": { "type": "number" }
+        }
+      }
+    },
+    {
+      "if": { "required": ["type"], "properties": { "type": { "const": "used" } } },
+      "then": {
+        "required": ["item"],
+        "properties": { "item": { "type": "string" } }
+      }
+    }
+  ]
+}

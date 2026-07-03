@@ -11,6 +11,10 @@ A mod writes JSON events — one complete JSON object per line — to a single a
 in the game's data directory. That is the full obligation. lt-client reads the file; the mod
 never interacts with lt-client directly.
 
+The *Line Format* and *Reserved Event Types* sections below have a machine-readable form in
+[`event.schema.json`](./event.schema.json) — validate your mod's output against it to prove
+compliance. See [SCHEMA.md](./SCHEMA.md).
+
 ---
 
 ## Events File

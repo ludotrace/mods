@@ -1,0 +1,6 @@
+{"type": "location", "game_time": "01:14"}
+{"target": "Raider", "game_time": "01:22"}
+{"type": "quest_stage", "quest": "The First Step", "stage": "ten"}
+{"type": "kill", "target": 12345}
+{"type": "used", "item": "Stimpak", "game_time": "18:22"
+{"type": "session_end", "wall_time": "15 November 2024"}
