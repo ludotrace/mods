@@ -41,6 +41,8 @@ The LudoTrace desktop client watches the file, extracts complete sessions, and u
 
 Read [`SPEC.md`](./SPEC.md) — it defines the full contract: file naming, event format, reserved types, and mod principles.
 
+Then validate your mod's output against [`event.schema.json`](./event.schema.json) to prove it's compliant — see [`SCHEMA.md`](./SCHEMA.md).
+
 The implementation language and engine integration are entirely up to you. Existing mods use:
 - **Papyrus** (Fallout 4, Skyrim, Starfield)
 - **SMAPI** (Stardew Valley)
@@ -54,6 +56,7 @@ If you build a mod, open an issue or PR to add it to the table above.
 ## Resources
 
 - [SPEC.md](./SPEC.md) — full schema contract
+- [SCHEMA.md](./SCHEMA.md) — machine-readable `event.schema.json` + validator
 - [ludotrace/fallout4](https://github.com/ludotrace/fallout4) — reference implementation (Papyrus)
 - [ludotrace.github.io](https://ludotrace.github.io) — project site
 

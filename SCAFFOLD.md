@@ -3,6 +3,10 @@
 Use this document to scaffold a new LudoTrace capture mod for any game.
 Fill in the **Inputs** block, then hand this document (plus `SPEC.md`) to Claude Code.
 
+The mod's output must satisfy the machine-readable contract in `event.schema.json` — validate
+it with `lt-validate` (see `SCHEMA.md`). Every scaffold ships a compliance-CI workflow that
+runs this check on each push.
+
 ---
 
 ## How to invoke
@@ -406,6 +410,37 @@ Initial release.
 
 ---
 
+### 3.10 `<game_id>/examples/sample.jsonl`
+
+A short, realistic sample of the mod's output — enough lines to cover `session_start`, the
+main mid-session events, any game-specific types, and `session_end`. This is both a fixture
+for compliance CI (3.11) and a reference for contributors. Use realistic values, not
+placeholders.
+
+### 3.11 `<game_id>/.github/workflows/spec-compliance.yml`
+
+Validates `examples/sample.jsonl` against the LudoTrace event schema on every push. The
+validator (`lt-validate`) embeds the schema, so this repo carries no copy to drift. See
+[SCHEMA.md](./SCHEMA.md) for the full contract.
+
+```yaml
+name: spec-compliance
+on: [push, pull_request]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: fetch validator
+        run: |
+          curl -sSL -o lt-validate \
+            https://github.com/ludotrace/mods/releases/latest/download/lt-validate-linux-amd64
+          chmod +x lt-validate
+      - run: ./lt-validate examples/sample.jsonl
+```
+
+---
+
 ## Publishing targets
 
 Every mod publishes to two places: **GitHub** (always) and the **game's mod community**
@@ -458,6 +493,8 @@ From `SPEC.md` and the client integration contract above:
 
 7. **Field names from SPEC exactly.** `type`, `game_time`, `game_date`, `wall_time`,
    `kill.target`, `kill.killer`, `stat.stat`, `stat.value`, `location.name`, etc.
+   `lt-validate` (see [SCHEMA.md](./SCHEMA.md)) checks this mechanically for reserved types —
+   run it on sample output before considering the scaffold done.
 
 8. **`session_start` is the only structural boundary.** The mod must write one at the
    start of every play session. Crashes and force-quits are handled by lt-client's
@@ -482,5 +519,7 @@ The scaffold is complete when:
 - [ ] `README.md` is present and community-facing (a player can install from it alone)
 - [ ] `.github/workflows/release.yml` is present with the correct community upload step
 - [ ] `CHANGELOG.md` has an initial entry
-- [ ] A sample play produces valid JSONL (`jq -c '.' lt_<game_id>_events.jsonl` passes)
+- [ ] A sample play produces SPEC-compliant JSONL — validated with `lt-validate
+  lt_<game_id>_events.jsonl`, not just `jq` (jq only checks JSON well-formedness; `lt-validate`
+  checks the reserved-type field contract). See [SCHEMA.md](./SCHEMA.md).
 - [ ] First line of any session is `session_start`; no structural reliance on `session_end`
