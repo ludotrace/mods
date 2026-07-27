@@ -52,7 +52,7 @@ and must never be violated by the mod.
   contain many `session_end` lines (e.g. Fallout 4 writes one per save). This is
   intentional and game-agnostic; never design around `session_end` as a close signal
 - Sessions without `session_end` (crash, force-quit, or a post-session parser that runs
-  before a clean exit) are flushed by lt-client's 30-minute inactivity window — the mod
+  before a clean exit) are flushed by lt-client's 12-minute inactivity window — the mod
   does not need to handle this
 
 **Game identity contract:**
@@ -498,7 +498,7 @@ From `SPEC.md` and the client integration contract above:
 
 8. **`session_start` is the only structural boundary.** The mod must write one at the
    start of every play session. Crashes and force-quits are handled by lt-client's
-   30-minute inactivity window — no mod-side fallback needed.
+   12-minute inactivity window — no mod-side fallback needed.
 
 9. **VERSION is the single version source of truth.** Never hardcode version strings
    in source, manifests, or CI independently.
