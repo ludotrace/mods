@@ -25,7 +25,7 @@ lt_<game_id>_events.jsonl
 
 Examples:
 ```
-lt_fo4_events.jsonl
+lt_fallout4_events.jsonl
 lt_stardew_events.jsonl
 lt_rdr2_events.jsonl
 ```
