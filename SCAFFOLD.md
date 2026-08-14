@@ -54,6 +54,8 @@ and must never be violated by the mod.
 - Sessions without `session_end` (crash, force-quit, or a post-session parser that runs
   before a clean exit) are flushed by lt-client's 12-minute inactivity window — the mod
   does not need to handle this
+- Events with no `session_start` ahead of them are held and attached to the next session,
+  not discarded. Emitting an opener is worth doing; being unable to is not data loss
 
 **Game identity contract:**
 - lt-client derives `game_id` from the user's `config.toml`, not from filename or JSONL
@@ -131,8 +133,8 @@ For each SPEC reserved type, decide: **applicable**, **not applicable**, or
 
 | Reserved type | Applicable? | Hook / trigger |
 |---------------|-------------|----------------|
-| `session_start` | always | see 1.3 |
-| `session_end` | always | see 1.3 |
+| `session_start` | wherever the game can signal a session beginning | see 1.3 |
+| `session_end` | optional — opaque payload, never a terminator | see 1.3 |
 | `location` | if named locations exist | ? |
 | `kill` | if combat exists | ? |
 | `quest_stage` | if quests exist | ? |
@@ -496,9 +498,11 @@ From `SPEC.md` and the client integration contract above:
    `lt-validate` (see [SCHEMA.md](./SCHEMA.md)) checks this mechanically for reserved types —
    run it on sample output before considering the scaffold done.
 
-8. **`session_start` is the only structural boundary.** The mod must write one at the
-   start of every play session. Crashes and force-quits are handled by lt-client's
-   12-minute inactivity window — no mod-side fallback needed.
+8. **`session_start` is the only structural boundary.** Write one at the start of every
+   play session the game lets you detect. It is advisory, not required (see *What a mod
+   must emit* in [SPEC.md](./SPEC.md)): a stretch of play the game gives you no way to
+   open is still captured. Crashes and force-quits are handled by lt-client's 12-minute
+   inactivity window — no mod-side fallback needed.
 
 9. **VERSION is the single version source of truth.** Never hardcode version strings
    in source, manifests, or CI independently.
@@ -522,4 +526,5 @@ The scaffold is complete when:
 - [ ] A sample play produces SPEC-compliant JSONL — validated with `lt-validate
   lt_<game_id>_events.jsonl`, not just `jq` (jq only checks JSON well-formedness; `lt-validate`
   checks the reserved-type field contract). See [SCHEMA.md](./SCHEMA.md).
-- [ ] First line of any session is `session_start`; no structural reliance on `session_end`
+- [ ] Where a session start is detectable, `session_start` is the session's first line; no
+  structural reliance on `session_end`

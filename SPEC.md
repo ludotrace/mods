@@ -15,6 +15,49 @@ The *Line Format* and *Reserved Event Types* sections below have a machine-reada
 [`event.schema.json`](./event.schema.json) — validate your mod's output against it to prove
 compliance. See [SCHEMA.md](./SCHEMA.md).
 
+### What a mod must emit
+
+The bar is deliberately low, because a game may be physically unable to clear a higher one.
+A mod is compliant when it satisfies the **required** tier alone.
+
+**Required**
+
+- Append one complete JSON object per line to `lt_<game_id>_events.jsonl`, each with a
+  `type` field.
+- Never truncate, rotate, rename, or delete that file. The mod only ever appends.
+- Use the exact `game_id` registered for the game — no abbreviation, no alias. `fallout4`,
+  not `fo4`.
+
+**Advisory — improves results, never required for correctness**
+
+- `session_start` when a play session begins, if the game can express it. It is the only
+  structural boundary a reader can use, so emitting it produces cleaner session splits and
+  a usable session duration. Some games cannot emit one for every stretch of play — a
+  player who resumes after idling without reloading, for instance. That is expected, and
+  its absence must never cost data: a reader that finds events with no opener in range
+  holds them and attaches them to the next session rather than discarding them.
+- A state snapshot on `session_start` — level, stats, location, whatever the game exposes.
+  It is the baseline everything later in the file is read against.
+- Timestamps — whichever of `game_time`, `game_date`, and `wall_time` the game makes
+  reachable, in the forms *Line Format* specifies. Keep each field's form fixed for the
+  life of the file: what a reader can do with a timestamp is compare it to another one, and
+  a field that changes shape mid-file cannot be compared to itself. Omitting a field
+  outright is better than emitting it in a shape the file's other lines don't share.
+
+**Not required**
+
+- `session_end`, or any terminator. A session may end in a crash, a force-quit, or a player
+  who simply walks away, and a mod is not present to observe any of them. Session ends are
+  resolved by the reader, which outlives the game process. A mod that emits `session_end`
+  is emitting ordinary payload (see below), not a boundary.
+- Any particular reserved event type. Emit the ones the game can observe; skip the rest.
+
+**Opaque**
+
+- Every event type other than `session_start`, including `session_end` and any
+  game-specific type. It is buffered and passed through verbatim. No reader interprets a
+  payload field structurally, so no mod should design around one being noticed.
+
 ---
 
 ## Events File
@@ -81,9 +124,11 @@ Written when a play session begins (on game load, new game, or equivalent).
 {"type": "session_start", "game_time": "00:00", ...character/world snapshot fields}
 ```
 
-- Must be the first event in every session.
+- Advisory, not required — see *What a mod must emit*. Emit it when the game can express
+  the start of a session; a stretch of play with no opener is still captured.
+- When emitted, it is the first event of the session it opens.
 - Should include a snapshot of the player's current state (level, stats, inventory, etc.)
-  so Core has baseline context for the session.
+  so the session has baseline context.
 - `session_start` is the **only** structural boundary lt-client uses to split sessions — a new `session_start` closes whatever session was open and starts a new one.
 
 ### `session_end`
@@ -100,8 +145,9 @@ Written when a play session ends (on save, quit, or equivalent).
   without treating it as a terminator. A single play session (one `session_start`) may
   contain many `session_end` lines (e.g. Fallout 4 writes one per save); this is
   intentional and game-agnostic — never design around `session_end` as a close signal.
-- A session without a new `session_start` to close it (crash, force-quit) is uploaded as
-  an orphan after a configured inactivity window.
+- A session with no new `session_start` to close it (crash, force-quit, a player who
+  stops playing) is closed by lt-client's 12-minute inactivity window and uploaded like
+  any other. The mod needs no fallback of its own.
 
 ### `location`
 
